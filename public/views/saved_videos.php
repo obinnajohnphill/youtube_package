@@ -41,6 +41,9 @@ if (!empty ($_GET['delete-msg'])){
 
 $videos = new YoutubeVideosRepository();
 $showall = $videos->all();
+if ($showall == null){
+    echo "There are no videos in the database";
+}
 
 ?>
 
