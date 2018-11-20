@@ -14,10 +14,14 @@ use Obinna\Controllers\YoutubeVideosController;
 use Obinna\Services\YoutubeVideosService;
 
 ## Process selected-to-save videos
-if (!empty($_POST["videoId"])){
+if (!empty($_POST["videoId"]) AND !empty($_POST["title"])){
     $save = new YoutubeVideosService($_POST["videoId"],$_POST["title"]);
 }
 
+## Process selected-to-save videos
+if (!empty($_POST["videoId"]) AND !empty($_POST["delete"])){
+    $delete = new YoutubeVideosService($_POST["videoId"],$_POST["delete"]);
+}
 
 ## Process the search items videos
 if (isset($_POST["searchterm"]) AND isset($_POST["number"]) )

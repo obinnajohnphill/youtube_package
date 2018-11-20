@@ -5,42 +5,9 @@
     <title>YouTube Search</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-    <style>
-        body {
-            font-family: Arial;
-            width: 100%;
-            padding: 10px;
-        }
-
-        iframe {
-            border: 0px;
-        }
-        .video-tile {
-            display: inline-block;
-            margin: 10px 10px 20px 10px;
-        }
-
-        .videoDiv {
-            width: 250px;
-            height: 150px;
-            display: inline-block;
-        }
-        .videoTitle {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .videoDesc {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        .videoInfo {
-            width: 250px;
-        }
-    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/views.css">
+    <script src="../js/views.js"></script>
 
 </head>
 
@@ -58,10 +25,16 @@
     </div>
 </nav>
 
+<a rel="group_1" href="#select_all" align ="right">Select All</a>&ensp;
+<a rel="group_1" href="#select_none">Select None</a>&ensp;
+<a rel="group_1" href="#invert_selection">Invert Selection</a>
+
 <form action="/process" method="post">
 <?php
 
 session_start();
+
+
 if(isset($_SESSION['videos']) && isset($_GET['number'])) {
     for ($i = 0; $i < $_GET['number']; $i++) {
         if (!empty($_SESSION['videos']['items'][$i]['id']['videoId'])){
@@ -75,8 +48,10 @@ if(isset($_SESSION['videos']) && isset($_GET['number'])) {
                         data-autoplay-src="//www.youtube.com/embed/<?php echo $videoId; ?>?autoplay=1"></iframe>
             </div>
 
+            <fieldset id="group_1">
             <input type="checkbox" name="videoId[]" value="<?php echo $videoId; ?>"><br>
             <input type="hidden" name="title[]" value="<?php echo $title; ?>">
+            </fieldset>
 
             <div class="videoInfo">
                 <div class="videoTitle"><b><?php echo $title; ?></b></div>
@@ -88,7 +63,7 @@ if(isset($_SESSION['videos']) && isset($_GET['number'])) {
     }
 }
 ?>
-<input type="submit" class="btn btn-primary" value="Submit">
+<input type="submit" class="btn btn-primary btn-lg" value="Submit">
 </form>
 </body>
 </html>

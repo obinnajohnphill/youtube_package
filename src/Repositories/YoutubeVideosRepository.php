@@ -59,4 +59,13 @@ class YoutubeVideosRepository extends YoutubeVideosModel
         return $this->duplicate;
     }
 
+    public function delete($video_id){
+        $query  = "DELETE FROM videos WHERE video_id = '$video_id'";
+        mysqli_query($this->connect(), $query);
+        session_start();
+        $payload ['delete-msg'] = "Videos deleted from database";
+        $redirect = "../saved_videos?" . http_build_query($payload);;
+        header("Location: $redirect");
+    }
+
 }

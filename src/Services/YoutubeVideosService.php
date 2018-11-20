@@ -22,7 +22,12 @@ class YoutubeVideosService extends YoutubeVideosRepository
    {
        $this->video_id = $videId;
        $this->title = $title;
-       $this->saveVideos();
+       if ($this->title != "delete"){
+           $this->saveVideos();
+       }else{
+           $this->deleteVideos();
+       }
+
    }
 
    public function saveVideos(){
@@ -36,6 +41,12 @@ class YoutubeVideosService extends YoutubeVideosRepository
 
        }
 
+   }
+
+   public function deleteVideos(){
+       for ($i = 0; $i < count($this->video_id); $i++) {
+           $this->delete($this->video_id[$i]);
+       }
    }
 
 }
