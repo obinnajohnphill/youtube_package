@@ -19,7 +19,7 @@ class YoutubeVideosController {
     function processRequest()
     {
 
-        $key = 'AIzaSyA2672oz5kG0LhsGC27QsNh6Bbj6HEeUws';
+        $key = 'xxxxxx GOOGLE API KEY xxxxx';
         $stripped = str_replace(' ', '', $this->searchterm);
         $url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q='.$stripped.'&maxResults='.$this->number.'&key='.$key;
 

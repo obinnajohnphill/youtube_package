@@ -28,3 +28,19 @@ copy the index.php file from package to your project directory
 Generate optimised autoload file:
 composer dumpautoload -o
 
+Run: 
+
+sudo apt-get install php7.2-bcmath
+
+composer require php-amqplib/php-amqplib
+
+
+
+Copy:
+
+public folder into the root of your app
+
+
+Create Database Table:
+
+CREATE TABLE videos( id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, video_id VARCHAR(30) NOT NULL, title VARCHAR(500) NOT NULL, created_date TIMESTAMP )
