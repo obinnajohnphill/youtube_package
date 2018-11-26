@@ -11,6 +11,7 @@ namespace Obinna\Services;
 
 use Obinna\RabbitMQ\SendMessage;
 use Obinna\Repositories\YoutubeVideosRepository;
+use Obinna\YoutubeVideosModel;
 
 
 class YoutubeVideosService extends YoutubeVideosRepository
@@ -21,7 +22,8 @@ class YoutubeVideosService extends YoutubeVideosRepository
 
    public function __construct($videId,$title)
    {
-       parent::__construct();
+       $connect = new YoutubeVideosModel ();
+       parent::__construct($connect);
 
        $this->video_id = $videId;
        $this->title = $title;

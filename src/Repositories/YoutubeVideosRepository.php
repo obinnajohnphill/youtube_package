@@ -13,7 +13,7 @@ use PDOException;
 use Obinna\YoutubeVideosModel;
 use Memcached;
 
-class YoutubeVideosRepository extends YoutubeVideosModel
+class YoutubeVideosRepository
 {
 
     public $data;
@@ -22,9 +22,14 @@ class YoutubeVideosRepository extends YoutubeVideosModel
     public $memcached;
     public $memcached_key = "select";
 
-    public function __construct()
+    public function __construct(YoutubeVideosModel $connect)
     {
-        parent::__construct();
+        $this->host = $connect->host();
+        $this->db = $connect->db();
+        $this->user = $connect->user();
+        $this->pass= $connect->pass();
+        $this->memcached_server = $connect->memcached_server();
+        $this->memcached_server_port = $connect->memcached_server_port();
 
         try{
             $this->conn = new PDO("mysql:host=$this->host ;dbname=$this->db", $this->user, $this->pass);
