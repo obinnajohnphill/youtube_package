@@ -40,7 +40,7 @@ if (!empty ($_GET['delete-msg'])){
     echo '<div style="color:red">' .$message.'</div>';
 }
 
-$connect = new YoutubeVideosModel();
+$connect = new YoutubeVideosModel ();
 $videos = new YoutubeVideosRepository($connect);
 $showall = $videos->all();
 if ($showall == null){
