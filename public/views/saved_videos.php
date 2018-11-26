@@ -29,6 +29,7 @@
 include dirname(__FILE__).'/../../vendor/autoload.php';
 
 use Obinna\Repositories\YoutubeVideosRepository;
+use Obinna\YoutubeVideosModel;
 
 if (!empty ($_GET['msg'])){
     $message = $_GET['msg'];
@@ -53,24 +54,26 @@ if ($showall == null){
 
 <form action="/process" method="post">
 <?php
+if (!empty($showall['videoId'])){
 for ($i = 0; $i < count($showall['videoId']); $i++) {
     $videoId = $showall['videoId'][$i];
     $title = $showall['title'][$i];
-?>
-<div class="video-tile">
-    <div class="videoDiv">
-        <iframe id="iframe" style="width:100%;height:100%" src="//www.youtube.com/embed/<?php echo $videoId; ?>"
-                data-autoplay-src="//www.youtube.com/embed/<?php echo $videoId; ?>?autoplay=1"></iframe>
+    ?>
+    <div class="video-tile">
+        <div class="videoDiv">
+            <iframe id="iframe" style="width:100%;height:100%" src="//www.youtube.com/embed/<?php echo $videoId; ?>"
+                    data-autoplay-src="//www.youtube.com/embed/<?php echo $videoId; ?>?autoplay=1"></iframe>
+        </div>
+        <fieldset id="group_1">
+            <input type="checkbox" name="videoId[]" value="<?php echo $videoId; ?>"><br>
+            <input type="hidden" name="delete" value="delete">
+        </fieldset>
+        <div class="videoInfo">
+            <div class="videoTitle"><b><?php echo $title; ?></b></div>
+        </div>
     </div>
-    <fieldset id="group_1">
-    <input type="checkbox" name="videoId[]" value="<?php echo $videoId; ?>"><br>
-    <input type="hidden" name="delete" value="delete">
-    </fieldset>
-    <div class="videoInfo">
-        <div class="videoTitle"><b><?php echo $title; ?></b></div>
-    </div>
-</div>
-<?php
+    <?php
+  }
 }
 
 ?>

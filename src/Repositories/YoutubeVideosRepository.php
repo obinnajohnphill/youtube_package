@@ -8,33 +8,87 @@
 
 namespace Obinna\Repositories;
 
-
+use PDO;
+use PDOException;
 use Obinna\YoutubeVideosModel;
+use Memcached;
 
 class YoutubeVideosRepository extends YoutubeVideosModel
 {
 
     public $data;
     public $duplicate;
+    public $conn;
+    public $memcached;
+    public $memcached_key = "select";
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        try{
+            $this->conn = new PDO("mysql:host=$this->host ;dbname=$this->db", $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            }
+            catch(PDOException $e)
+            {
+            echo "Database connection failed: " . $e->getMessage();
+        }
+        $this->memcached = new Memcached();
+        $this->memcached ->addServer($this->memcached_server,$this->memcached_server_port );
+
+    }
+
 
     public function all(){
-        $query = "SELECT * FROM  videos";
-        $result = mysqli_query($this->connect(), $query);
+        try{
 
-            while ($row = mysqli_fetch_assoc($result)) {
+            ## Get result from memcached if data exists in cache
+            $data = file_get_contents("cache.txt");
+            $file = unserialize( $data );
+            $cached = $this->memcached->get("select");
+            if ($this->memcached->getResultCode() !== Memcached::RES_NOTFOUND) {
+                if ($file == $cached){
+                    echo "Cached Data:  ";
+                    return  $cached;
+                }
+            }
+            ## Run query to get data if no longer in cache
+            $statement  = $this->conn->prepare("SELECT * FROM  videos");
+            $statement ->execute();
+            while ( $row = $statement->fetch(PDO::FETCH_ASSOC))
+            {
                 $videoId[] = $row['video_id'];
                 $title[] = $row['title'];
                 $this->data = array("videoId"=>$videoId,"title"=>$title);
             }
-        $this->close(); ## Close mysqli connection
-        return  $this->data;
+            if ($file != $cached){
+                $this->memcached->set("select", $this->data, 60*60); ## Sets data into cache
+            }
+            file_put_contents("cache.txt",serialize($this->data));
+            return  $this->data;
+
+        }
+        catch(PDOException $e)
+        {
+            echo "Select all failed: " . $e->getMessage();
+        }
     }
 
-    public function saveAll($video_id,$title){
+
+    public function saveAll($video_id,$title)
+    {
         $payload = array();
-        $query = "INSERT INTO videos (video_id, title)VALUES('$video_id','$title')";
-        mysqli_query($this->connect(),$query);
-        $this->close(); ## Close mysqli connection
+        try {
+            $statement = $this->conn->prepare("INSERT INTO videos (video_id, title) VALUES ('$video_id','$title')");
+            $statement->execute();
+            $statement = null;
+            $this->memcached->flush();
+        }
+        catch(PDOException $e)
+        {
+            echo "Insert failed: " . $e->getMessage();
+        }
         session_start();
         $payload ['msg'] = "Your video has been saved";
         $redirect = "../saved_videos?".http_build_query($payload);;
@@ -43,25 +97,40 @@ class YoutubeVideosRepository extends YoutubeVideosModel
 
 
     public function checkDuplicate($video_id,$title){
-        $query  = "SELECT * FROM  videos WHERE video_id = '$video_id'";
-        $result = mysqli_query($this->connect(), $query);
-        if ($result->num_rows > 0) {
-            $this->close();
-            session_start();
-            $data[] = $title;
-            $payload ['msg'] = "Duplicate video exists in database";
-            $payload ['title'] = $data;
-            $redirect = "../?" . http_build_query($payload);;
-            header("Location: $redirect");
-        }else{
-            $this->duplicate = true;
+        try {
+            $statement = $this->conn->prepare("SELECT * FROM  videos WHERE video_id = '$video_id'");
+            $statement->execute();
+            $number_of_rows = $statement->fetchColumn();
+            if ($number_of_rows > 0) {
+                session_start();
+                $data[] = $title;
+                $payload ['msg'] = "Duplicate video exists in database";
+                $payload ['title'] = $data;
+                $redirect = "../?" . http_build_query($payload);;
+                header("Location: $redirect");
+            } else {
+                $this->duplicate = true;
+            }
+            return $this->duplicate;
         }
-        return $this->duplicate;
+        catch(PDOException $e)
+        {
+            echo "Check num-rows failed: " . $e->getMessage();
+        }
     }
 
+
     public function delete($video_id){
-        $query  = "DELETE FROM videos WHERE video_id = '$video_id'";
-        mysqli_query($this->connect(), $query);
+        try{
+            $statement = $this->conn->prepare("DELETE FROM videos WHERE video_id = '$video_id'");
+            $statement->execute();
+            $statement = null;
+            $this->memcached->flush();
+        }
+        catch(PDOException $e)
+        {
+        echo "Delete failed: " . $e->getMessage();
+        }
         session_start();
         $payload ['delete-msg'] = "Videos deleted from database";
         $redirect = "../saved_videos?" . http_build_query($payload);;

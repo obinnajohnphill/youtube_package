@@ -13,7 +13,7 @@ require_once ("$directory./vendor/autoload.php");
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-
+use Dotenv;
 
 class SendMessage
 {
@@ -23,7 +23,12 @@ class SendMessage
     }
 
     public function receive(){
-        $connection = new AMQPStreamConnection('localhost', 5672, 'obinna', 'obinna');
+
+        $directory = chop($_SERVER["DOCUMENT_ROOT"],'public');
+        $dotenv = new Dotenv\Dotenv($directory.'/');
+        $dotenv->load();
+
+        $connection = new AMQPStreamConnection($_ENV['RabbitMQ_Host'], $_ENV['RabbitMQ_Port'], $_ENV['RabbitMQ_Username'], $_ENV['RabbitMQ_Password']);
         $channel = $connection->channel();
 
         $channel->queue_declare('message', false, false, false, false);

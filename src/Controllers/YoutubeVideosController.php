@@ -1,6 +1,18 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: obinnajohnphill
+ * Date: 14/11/18
+ * Time: 18:22
+ */
 
 namespace Obinna\Controllers;
+
+
+$directory = chop($_SERVER["DOCUMENT_ROOT"],'public');
+require_once ("$directory./vendor/autoload.php");
+
+use Dotenv;
 
 class YoutubeVideosController {
 
@@ -18,8 +30,10 @@ class YoutubeVideosController {
 
     function processRequest()
     {
-
-        $key = 'xxxxxx GOOGLE API KEY xxxxxx';
+        $directory = chop($_SERVER["DOCUMENT_ROOT"],'public');
+        $dotenv = new Dotenv\Dotenv($directory.'/');
+        $dotenv->load();
+        $key  = $_ENV['GOOGLE_API_KEY'];
         $stripped = str_replace(' ', '', $this->searchterm);
         $url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&q='.$stripped.'&maxResults='.$this->number.'&key='.$key;
 

@@ -1,26 +1,34 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: obinnajohnphill
+ * Date: 14/11/18
+ * Time: 18:24
+ */
 
 namespace Obinna;
 
-class YoutubeVideosModel {
+use Dotenv;
 
-    public $host = '192.168.10.10';
-    public $user = 'homestead';
-    public $pass = 'secret';
-    public $db = 'youtube_video';
-    public $conn;
+class YoutubeVideosModel
+{
+    protected $host;
+    protected $user;
+    protected $pass;
+    protected $db;
+    protected $memcached_server;
+    protected $memcached_server_port;
 
-    function connect() {
-        $con = mysqli_connect($this->host, $this->user, $this->pass, $this->db);
-        if (!$con) {
-            die('Could not connect to database!');
-        }else {
-            $this->conn = $con;
-        }
-        return $this->conn;
-    }
+    public function __construct(){
+        $directory = chop($_SERVER["DOCUMENT_ROOT"],'public');
+        $dotenv = new Dotenv\Dotenv($directory.'/');
+        $dotenv->load();
+        $this->host =  $_ENV['DB_HOST'];
+        $this->user =  $_ENV['DB_USER'];
+        $this->pass =  $_ENV['DB_PWD'];
+        $this->db =  $_ENV['DB_NAME'];
+        $this->memcached_server = $_ENV['MEMCACHED_SERVER'];
+        $this->memcached_server_port = $_ENV['MEMCACHED_SERVER_PORT'];
+     }
 
-    function close() {
-       return  mysqli_close($this->conn);
-    }
 }
