@@ -24,15 +24,8 @@ class YoutubeVideosRepository
 
     public function __construct(YoutubeVideosModel $connect)
     {
-        $this->host = $connect->host();
-        $this->db = $connect->db();
-        $this->user = $connect->user();
-        $this->pass= $connect->pass();
-        $this->memcached_server = $connect->memcached_server();
-        $this->memcached_server_port = $connect->memcached_server_port();
-
         try{
-            $this->conn = new PDO("mysql:host=$this->host ;dbname=$this->db", $this->user, $this->pass);
+            $this->conn = new PDO('mysql:host='.$connect->host().';dbname='.$connect->db().'', $connect->user(), $connect->pass());
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             }
             catch(PDOException $e)
@@ -40,14 +33,12 @@ class YoutubeVideosRepository
             echo "Database connection failed: " . $e->getMessage();
         }
         $this->memcached = new Memcached();
-        $this->memcached ->addServer($this->memcached_server,$this->memcached_server_port );
-
+        $this->memcached ->addServer($connect->memcached_server(),$connect->memcached_server_port());
     }
 
 
     public function all(){
         try{
-
             ## Get result from memcached if data exists in cache
             $data = file_get_contents("cache.txt");
             $file = unserialize( $data );

@@ -31,9 +31,9 @@ class YoutubeVideosModel
         $this->memcached_server_port = $_ENV['MEMCACHED_SERVER_PORT'];
      }
 
-     public function host(){
+    public function host(){
         return $this->host;
-     }
+    }
 
     public function user(){
         return $this->user;
