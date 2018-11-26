@@ -40,7 +40,8 @@ if (!empty ($_GET['delete-msg'])){
     echo '<div style="color:red">' .$message.'</div>';
 }
 
-$videos = new YoutubeVideosRepository();
+$connect = new YoutubeVideosModel();
+$videos = new YoutubeVideosRepository($connect);
 $showall = $videos->all();
 if ($showall == null){
     echo "There are no videos in the database";
