@@ -31,6 +31,8 @@ sudo composer require vlucas/phpdotenv
 
 Install RabbitMQ Server and set user https://www.rabbitmq.com/download.html
 
+Install php memchached
+
 Prepare project:
 copy the index.php file from package to your project directory
 
