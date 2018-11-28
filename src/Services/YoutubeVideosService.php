@@ -10,20 +10,19 @@ namespace Obinna\Services;
 
 
 use Obinna\RabbitMQ\SendMessage;
-use Obinna\Repositories\YoutubeVideosRepository;
-use Obinna\YoutubeVideosModel;
+use Obinna\Container\YoutubeVideosContainer;
 
-
-class YoutubeVideosService extends YoutubeVideosRepository
+class YoutubeVideosService
 {
 
    public $video_id;
    public $title;
+   public $container;
 
    public function __construct($videId,$title)
    {
-       $connect = new YoutubeVideosModel ();
-       parent::__construct($connect);
+       $con = new YoutubeVideosContainer();
+       $this->container = $con->getYoutubeVideosRepository();
 
        $this->video_id = $videId;
        $this->title = $title;
@@ -37,17 +36,17 @@ class YoutubeVideosService extends YoutubeVideosRepository
 
    public function saveVideos(){
        for ($i = 0; $i < count($this->video_id); $i++) {
-           $isduplicate = $this->checkDuplicate($this->video_id[$i],$this->title[$i]);
+           $isduplicate = $this->container->checkDuplicate($this->video_id[$i],$this->title[$i]);
            if ($isduplicate == true){
                new SendMessage();
-              $this->saveAll($this->video_id[$i],$this->title[$i]);
+               $this->container->saveAll($this->video_id[$i],$this->title[$i]);
            }
        }
    }
 
    public function deleteVideos(){
        for ($i = 0; $i < count($this->video_id); $i++) {
-           $this->delete($this->video_id[$i]);
+           $this->container->delete($this->video_id[$i]);
        }
    }
 
