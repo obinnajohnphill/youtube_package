@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html>
 <head>
@@ -28,8 +27,7 @@
 
 include dirname(__FILE__).'/../../vendor/autoload.php';
 
-use Obinna\Repositories\YoutubeVideosRepository;
-use Obinna\YoutubeVideosModel;
+use Obinna\Container\YoutubeVideosContainer;
 
 if (!empty ($_GET['msg'])){
     $message = $_GET['msg'];
@@ -40,9 +38,11 @@ if (!empty ($_GET['delete-msg'])){
     echo '<div style="color:red">' .$message.'</div>';
 }
 
-$connect = new YoutubeVideosModel ();
-$videos = new YoutubeVideosRepository($connect);
-$showall = $videos->all();
+## Call the a function within the Repository via the Container to get all videos
+$container = new YoutubeVideosContainer();
+$function = $container->getYoutubeVideosRepository();
+$showall = $function->all();
+
 if ($showall == null){
     echo "There are no videos in the database";
 }
