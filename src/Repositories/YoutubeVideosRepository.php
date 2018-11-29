@@ -40,11 +40,9 @@ class YoutubeVideosRepository
     public function all(){
         try{
             ## Get result from memcached if data exists in cache
-            $data = file_get_contents("cache.txt");
-            $file = unserialize( $data );
             $cached = $this->memcached->get("select");
             if ($this->memcached->getResultCode() !== Memcached::RES_NOTFOUND) {
-                if ($file == $cached){
+                if (!empty($cached)){
                     echo "Cached Data:  ";
                     return  $cached;
                 }
@@ -58,10 +56,9 @@ class YoutubeVideosRepository
                 $title[] = $row['title'];
                 $this->data = array("videoId"=>$videoId,"title"=>$title);
             }
-            if ($file != $cached){
-                $this->memcached->set("select", $this->data, 60*60); ## Sets data into cache
-            }
-            file_put_contents("cache.txt",serialize($this->data));
+
+            $this->memcached->set("select", $this->data, 60*60); ## Sets data into cache
+
             return  $this->data;
 
         }
